@@ -1,16 +1,18 @@
 package main
 
 import (
+	"fmt"
 	"math/rand/v2"
 	simmap "sandbox/sandbox/map"
 	simplego "sandbox/sandbox/mobility"
 	"sandbox/sandbox/painter"
 	"sandbox/sandbox/peer"
+	"strings"
 	"time"
 )
 
 func main() {
-	simmap := simmap.NewMap(50)
+	simmap := simmap.NewMap(30)
 	names := [5]string{"Alice", "John", "Matthew", "Gregory", "Maria"}
 	var peers []peer.Peer
 	for i := 0; i < len(names); i++ {
@@ -18,7 +20,7 @@ func main() {
 		simplego.PickRandomWaypointForPeer(&peers[i], simmap)
 	}
 
-	for i := 0; i < 1000; i++ {
+	for true {
 		tick(peers, simmap)
 	}
 }
@@ -29,25 +31,37 @@ func tick(peers []peer.Peer, m *simmap.Map) {
 		if simplego.IsOnWaypoint(peer) {
 			simplego.OnWaypointReach(peer)
 		}
-		toCreateNewWaypoint := rand.IntN(100) < 5 //5% chance of creating a new waypoint
+		toCreateNewWaypoint := rand.IntN(100) < 1 //5% chance of creating a new waypoint
 		if (toCreateNewWaypoint) {
 			simplego.PickRandomWaypointForPeer(peer, m)
 		}
 		simplego.SimpleMove(peer)
 		painter.Draw(m, peers)
-
+		simplego.UpdateConnections(peers)		
+		// debugOutput(peers, peers[i]);
 		time.Sleep(50 * time.Millisecond)
 	}
 }
 
-// func debugOutput (p peer.Peer) {
-// 	if i == 0 {
-// 		fmt.Println("========================================")
-// 		fmt.Println("Tick:", time.Now().Format("2006-01-02 15:04:05"))
-// 		fmt.Printf("%-3s %-12s %-20s %-20s\n", "ID", "NAME", "POSITION", "WAYPOINT")
-// 	}
-// 	p := peers[i]
-// 	pos := fmt.Sprintf("pos=%v,%v", p.X, p.Y)
-// 	wp := fmt.Sprintf("wp=%v,%v", p.WaypointX, p.WaypointY)
-// 	fmt.Printf("%-3d %-12s %-20s %-20s\n", i, p.Name, pos, wp)
-// }
+func debugOutput (peers []peer.Peer, p peer.Peer) {
+		pos := fmt.Sprintf("%d,%d", p.X, p.Y)
+		wp  := fmt.Sprintf("%d,%d", p.WaypointX, p.WaypointY)
+		
+		var conns string
+		if len(p.ConnectedTo) == 0 {
+			conns = "-"
+		} else {
+			var names []string
+			for _, id := range p.ConnectedTo {
+				for _, other := range peers {
+					if other.Id == id {
+						names = append(names, other.Name)
+						break
+					}
+				}
+			}
+			conns = strings.Join(names, ", ")
+		}
+
+		fmt.Printf("%-12s %-20s %-20s %s\n", p.Name, pos, wp, conns)
+}

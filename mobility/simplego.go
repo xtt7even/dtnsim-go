@@ -60,3 +60,36 @@ func PickRandomWaypointForPeer(peer *peer.Peer, m *simmap.Map) {
 	peer.WaypointX = randomPosition[0]
 	peer.WaypointY = randomPosition[1]
 }
+
+func UpdateConnections(peers []peer.Peer) {
+	for i := range peers {
+        peers[i].ConnectedTo = peers[i].ConnectedTo[:0]
+    }
+
+	for i := 0; i < len(peers); i++ {
+        root := &peers[i]
+
+        for j := i + 1; j < len(peers); j++ {   
+            neighbour := &peers[j]
+
+            if arePeersOverlapping(*root, *neighbour) {
+                root.ConnectedTo      = append(root.ConnectedTo,      neighbour.Id)
+                neighbour.ConnectedTo = append(neighbour.ConnectedTo, root.Id)
+            }
+        }
+    }
+}
+
+func arePeersOverlapping(root, neighbour peer.Peer) bool {
+    return !(root.X + root.ConnectionRadius < neighbour.X - neighbour.ConnectionRadius ||
+             root.X - root.ConnectionRadius > neighbour.X + neighbour.ConnectionRadius ||
+             root.Y + root.ConnectionRadius < neighbour.Y - neighbour.ConnectionRadius ||
+             root.Y - root.ConnectionRadius > neighbour.Y + neighbour.ConnectionRadius)
+}
+
+func getIfCoordInPeerArea(x int, y int, peer peer.Peer) bool {
+	if x < (peer.X - peer.ConnectionRadius) || x > (peer.X + peer.ConnectionRadius) || y < (peer.Y - peer.ConnectionRadius) || y > (peer.Y + peer.ConnectionRadius) {
+		return false
+	}
+	return true
+}

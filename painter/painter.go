@@ -26,9 +26,9 @@ func Draw(m *simmap.Map, peers []peer.Peer) {
 				}
 			}
 			if isPeerCoord {
-				fmt.Print("o")
+				fmt.Print(" 0 ")
 			} else {
-				fmt.Print(" ")
+				fmt.Print(" . ")
 			}
 		}
 		fmt.Println()
