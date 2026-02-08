@@ -1,11 +1,13 @@
 # Go P2P Sandbox
 
-A small sandbox repo for practicing **Go** by building a **simple DTN (aka store-carry-forward) peer-to-peer simulation**.
+A small sandbox repo for practicing **Go** by building a **simple DTN peer-to-peer simulation**.
 
-This project is for learning:
-- Go basics
-- Goroutines and channels
-- Simple peer communication
+## Goals
+This project is for:
+- Learning Go
+- Researching DTN principles and Store-Carry-Forward Paradigm
+- Simulating my ideas
+- Twisting my brain a little and escaping skills stagnation
 
 Not production code. Just experiments.
 
